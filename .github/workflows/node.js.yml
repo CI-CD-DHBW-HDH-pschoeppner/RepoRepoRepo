@@ -1,48 +1,60 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: Node.js CI
-run-name: ${{github.actor}} is running CI
+name: Build and push Docker image
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    # main has to be restricted from normal push,
+    # so this workflow runs only on a merged Pull Request
+    branches: [ main ]
 
 permissions:
+  packages: write
   contents: write
 
 jobs:
-  build:
-
+  build-test-and-push:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - uses: actions/checkout@v3
-    - name: install npm modules
-      run: npm install
-    - name: run ESLint
-      run: npm run lint
-    #- name: Svelte check
-    # run: npm run check
-    - name: run prettier check
-      run: npm run format:check
-    - name: unit tests
-      run: npm run test
-    - name: run build
-      run: npm run build
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        folder: dist # The folder the action should deploy
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        tags: user/app:latest
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14.x"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+    #  - name: Svelte check
+    #    run: npm run check
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+        
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        with:
+          folder: ./dist # The folder the action should deploy.
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/ci-cd-dhbw-hdh-pschoeppner/reporeporepo/tic-tac-toe:latest
