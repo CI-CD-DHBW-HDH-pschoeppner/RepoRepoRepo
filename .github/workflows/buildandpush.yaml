@@ -17,8 +17,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-        - name: switch dir
-        run: cd /backend
+      - name: switch dir
+        run: cd backend
 
       - name: Build gradle
         run: gradle build -Dquarkus.package.type=native
