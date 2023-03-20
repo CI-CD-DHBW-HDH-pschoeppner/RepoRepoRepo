@@ -11,6 +11,7 @@
     MoveMessage,
     Offer,
   } from "../logic/online/websocket";
+  import { sendMove } from "../logic/online/websocket";
 
   export let board: Field[];
   export let fieldToString: (arg0: Field) => string;
@@ -48,8 +49,8 @@
         playerID !== "" &&
         selfID !== "" &&
         onlinePlayer.connection !== undefined
-      ) {
-        // TODO: send the move, that was just made (line 48) to the connected player
+      ) {   
+        sendMove(playerID,selfID,index,board,player.connection!)
       } else {
         console.error(`failed to send move to player ${playerID}`);
       }
