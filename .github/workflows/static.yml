@@ -30,9 +30,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: switch dir
-        run: cd /frontend
         
       - name: install npm modules
         run: npm install

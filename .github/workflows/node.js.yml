@@ -16,9 +16,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: switch dir
-        run: cd /frontend
-
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
