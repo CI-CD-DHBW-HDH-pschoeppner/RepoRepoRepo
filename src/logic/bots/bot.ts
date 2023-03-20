@@ -8,7 +8,7 @@ export interface BotMove {
 }
 
 // returns the appropriated function for the given mode
-export function moveWithMode(mode: Mode): BotMove | undefined {
+export function botMoveWithMode(mode: Mode): BotMove | undefined {
   switch (mode) {
     case Mode.EASY:
       return easyMove;
