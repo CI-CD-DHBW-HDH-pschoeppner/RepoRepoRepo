@@ -1,4 +1,4 @@
-import { moveWithMode, type BotMove } from "./bots/bot";
+import { botMoveWithMode } from "./bots/bot";
 
 export enum Mode {
   EASY = 0,
@@ -18,40 +18,56 @@ export enum Field {
 export class Player {
   score = 0;
   field: Field.PLAYER1 | Field.PLAYER2;
-  botMove: BotMove | undefined = undefined;
+  mode: Mode = Mode.EASY;
+  connection: WebSocket | undefined = undefined;
 
-  constructor(f: Field.PLAYER1 | Field.PLAYER2) {
+  constructor(f: Field.PLAYER1 | Field.PLAYER2, m: Mode = Mode.EASY) {
     this.field = f;
+    this.mode = m;
   }
 
   addWin() {
     this.score++;
   }
+  resetScore() {
+    this.score = 0;
+  }
   isHuman(): boolean {
-    return this.botMove === undefined;
+    return this.mode === Mode.HUMAN;
+  }
+  isOnline(): boolean {
+    return this.mode === Mode.ONLINE;
   }
   move(board: Field[]): number {
-    if (this.botMove !== undefined) return this.botMove(board, this.field);
-    return -1;
+    switch (this.mode) {
+      case Mode.ONLINE:
+        return -1;
+      case Mode.HUMAN:
+        return -1;
+      default: {
+        const botMove = botMoveWithMode(this.mode);
+        if (botMove) {
+          return botMove(board, this.field);
+        }
+        return -1;
+      }
+    }
   }
 }
 
 export class Game {
   player: Player;
   enemy: Player;
-  mode: Mode;
 
   constructor(
     player: Player = new Player(Field.PLAYER1),
-    enemy: Player = new Player(Field.PLAYER2),
-    mode: Mode = Mode.EASY
+    enemy: Player = new Player(Field.PLAYER2)
   ) {
-    player.score = 0;
-    enemy.score = 0;
-    this.mode = mode;
+    player.resetScore();
+    player.mode = Mode.HUMAN;
+    enemy.resetScore();
     this.player = player;
     this.enemy = enemy;
-    this.enemy.botMove = moveWithMode(this.mode);
   }
 
   addWin(player: Field) {
@@ -65,21 +81,19 @@ export class Game {
     }
   }
   switchSides() {
-    const botMove = this.player.botMove;
-    this.player.botMove = this.enemy.botMove;
-    this.enemy.botMove = botMove;
-    const score = this.player.score;
-    this.player.score = this.enemy.score;
-    this.enemy.score = score;
+    const tempPlayer = this.player;
+    this.player = this.enemy;
+    this.enemy = tempPlayer;
+    this.player.field = Field.PLAYER1;
+    this.enemy.field = Field.PLAYER2;
   }
   updateMode(mode: Mode) {
-    this.mode = mode;
     if (this.player.isHuman() && this.enemy.isHuman() && mode != Mode.HUMAN) {
-      this.enemy.botMove = moveWithMode(this.mode);
+      this.enemy.mode = mode;
       return;
     }
-    if (!this.player.isHuman()) this.player.botMove = moveWithMode(this.mode);
-    if (!this.enemy.isHuman()) this.enemy.botMove = moveWithMode(this.mode);
+    if (!this.player.isHuman()) this.player.mode = mode;
+    if (!this.enemy.isHuman()) this.enemy.mode = mode;
   }
 }
 

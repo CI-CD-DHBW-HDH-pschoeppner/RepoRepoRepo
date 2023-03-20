@@ -7,7 +7,7 @@ export interface BotMove {
   (board: Field[], own: Field): number;
 }
 
-export function moveWithMode(mode: Mode): BotMove | undefined {
+export function botMoveWithMode(mode: Mode): BotMove | undefined {
   switch (mode) {
     case Mode.EASY:
       return easyMove;

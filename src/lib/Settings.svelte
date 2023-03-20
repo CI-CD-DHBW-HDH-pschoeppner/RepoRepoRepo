@@ -41,7 +41,7 @@
     <option value="medium">🤖❗</option>
     <option value="hard">❗🤖❗</option>
     <option value="human">👨‍💻</option>
-    <option value="online" disabled>👨‍💻 / 👨‍💻</option>
+    <option value="online">👨‍💻 / 👨‍💻</option>
   </select>
 </nav>
 

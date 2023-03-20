@@ -8,7 +8,9 @@
   let dispatch = createEventDispatcher();
 
   function toggle() {
-    dispatch<"switch">("switch");
+    if (!player.isOnline() && !enemy.isOnline()) {
+      dispatch<"switch">("switch");
+    }
   }
 </script>
 
@@ -17,6 +19,8 @@
     <i
       >{#if player.isHuman()}
         👨‍💻
+      {:else if player.isOnline()}
+        <!-- Find a good icon to reflect a player being online -->
       {:else}
         🤖
       {/if}</i
@@ -31,6 +35,8 @@
     <i
       >{#if enemy.isHuman()}
         👨‍💻
+      {:else if enemy.isOnline()}
+        <!-- Find a good icon to reflect a player being online -->
       {:else}
         🤖
       {/if}</i

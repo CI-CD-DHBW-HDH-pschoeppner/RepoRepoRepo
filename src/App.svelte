@@ -35,6 +35,8 @@
     board = newBoard();
     game.switchSides();
     game = game;
+    game.player = game.player;
+    game.enemy = game.enemy;
   }
 
   function themeChanged({ detail }: { detail: Theme }) {
@@ -55,11 +57,18 @@
 
 <header>
   <Settings on:change={modeChanged} />
-  <Scoreboard {...game} on:switch={() => switchPlayer()} />
+  <Scoreboard {...game} on:switch={switchPlayer} />
   <ThemeSelector on:changed={themeChanged} />
 </header>
 <main>
-  <Board {board} {fieldToString} {...game} on:finished={finished} />
+  <Board
+    {board}
+    {fieldToString}
+    player={game.player}
+    enemy={game.enemy}
+    on:finished={finished}
+    on:switch={switchPlayer}
+  />
 </main>
 
 <style>

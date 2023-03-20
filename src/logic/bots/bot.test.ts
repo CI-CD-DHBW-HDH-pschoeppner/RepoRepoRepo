@@ -1,5 +1,5 @@
 import { Field, Mode, newBoard } from "../game";
-import { moveWithMode, winningMove } from "./bot";
+import { botMoveWithMode, winningMove } from "./bot";
 
 describe("winning move", () => {
   it("no winning move", () => {
@@ -24,11 +24,11 @@ describe("winning move", () => {
 
 describe("moveWithMode with invalid mode", () => {
   it("Mode.HUMAN", () => {
-    const move = moveWithMode(Mode.HUMAN);
+    const move = botMoveWithMode(Mode.HUMAN);
     expect(move).toBe(undefined);
   });
   it("Mode.ONLINE", () => {
-    const move = moveWithMode(Mode.ONLINE);
+    const move = botMoveWithMode(Mode.ONLINE);
     expect(move).toBe(undefined);
   });
 });
