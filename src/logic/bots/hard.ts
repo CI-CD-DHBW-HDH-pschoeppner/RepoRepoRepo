@@ -1,6 +1,5 @@
 import { Field, getBlanks, invertPlayer, won } from "../game";
 
-// hardMove determines recursively determines the best move for the given player
 export function hardMove(board: Field[], own: Field): number {
   const blanks = getBlanks(board);
 
@@ -20,7 +19,6 @@ export function hardMove(board: Field[], own: Field): number {
   return bestScore[0];
 }
 
-// the minimax algorithm is used to determine the outcome (between -1 and 1) for a given board
 function minimax(
   board: Field[],
   currentPlayer: Field,
@@ -36,6 +34,7 @@ function minimax(
 
   let bestScore: number = maximize ? -Infinity : Infinity;
 
+  // let copyBoard = [...board]
   for (const move of blanks) {
     board[move] = currentPlayer;
     if (maximize) {

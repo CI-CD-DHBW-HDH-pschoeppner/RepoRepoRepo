@@ -1,4 +1,4 @@
-import { Field, isPlayer, Mode, winningPos } from "../game";
+import { Field, getBlanks, isPlayer, Mode, won } from "../game";
 import { easyMove } from "./easy";
 import { hardMove } from "./hard";
 import { mediumMove, pettyMove } from "./medium";
@@ -7,8 +7,7 @@ export interface BotMove {
   (board: Field[], own: Field): number;
 }
 
-// returns the appropriated function for the given mode
-export function botMoveWithMode(mode: Mode): BotMove | undefined {
+export function moveWithMode(mode: Mode): BotMove | undefined {
   switch (mode) {
     case Mode.EASY:
       return easyMove;
@@ -18,35 +17,24 @@ export function botMoveWithMode(mode: Mode): BotMove | undefined {
       return mediumMove;
     case Mode.HARD:
       return hardMove;
-    case Mode.HUMAN || Mode.ONLINE: // if both players are controlled by a human, returns undefined
+    case Mode.HUMAN || Mode.ONLINE:
       return undefined;
     default:
       return undefined;
   }
 }
 
-// winningMove returns:
-// - the winning move for a given player
-// - -1 if there is none
 export function winningMove(board: Field[], player: Field): number {
   if (!isPlayer(player)) throw new Error(`Player ${player} is not valid`);
+  const blanks = getBlanks(board);
+  const copyBoard = [...board];
 
-  winningPos.forEach(function (element) {
-    let amountCorrect = 0;
-    let nextMove = -1;
-    for (let i = 0; i < 3; i++) {
-      if (board[element[i]] == player) {
-        amountCorrect = amountCorrect + 1;
-      } else {
-        if (board[element[i]] == 0) {
-          nextMove = board[element[i]];
-        }
-      }
-    }
-    if (nextMove != -1) {
-      return nextMove;
-    }
-  });
+  for (const move of blanks) {
+    copyBoard[move] = player;
+    if (won(copyBoard) === player) return move;
+    copyBoard[move] = Field.EMPTY;
+  }
+
   return -1;
 }
 

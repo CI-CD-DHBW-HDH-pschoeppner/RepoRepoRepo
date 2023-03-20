@@ -1,39 +1,28 @@
-import { Field, getBlanks, invertPlayer, won } from "../game";
+import { getBlanks, invertPlayer, type Field } from "../game";
+import { randomMove, winningMove } from "./bot";
 
-// the medium bot:
-// - chooses the winning move, if it can win
-// - blocks the player from winning, if it can
-// - chooses the middle (4) field, if it can
-// - chooses a random move otherwise
 export function mediumMove(board: Field[], own: Field): number {
   const blanks = getBlanks(board);
 
-  const moves: Map<number, number> = new Map();
-  for (const move of blanks) {
-    const copyBoard = [...board];
-    copyBoard[move] = own;
-    moves.set(move, pettyMove(copyBoard, own));
-    copyBoard[move] = Field.EMPTY;
-  }
+  // first check, if the bot can win
+  const win = winningMove(board, own);
+  if (win >= 0) return win;
 
-  let bestScore: [number, number] = [-1, -Infinity];
-  for (const move of moves) {
-    if (move[1] > bestScore[1]) bestScore = move;
-  }
+  // then check, if we can block a win
+  const block = winningMove(board, invertPlayer(own));
+  if (block >= 0) return block;
 
-  return bestScore[0];
+  if (blanks.some((field) => field === 4)) return 4;
+
+  return blanks[randomMove(blanks.length)];
 }
 
-// this bot:
-// - blocks the player from winning, if it can
-// - chooses a random move otherwise
+// this bot just tries to block a win
 export function pettyMove(board: Field[], own: Field): number {
   const blanks = getBlanks(board);
 
-  const winner = won(board);
-  if (winner === own) return 1; // win
-  else if (winner === invertPlayer(own)) return -1; // loss
-  else if (!blanks.length) return 0; // draw
+  const block = winningMove(board, invertPlayer(own));
+  if (block >= 0) return block;
 
-  return -1;
+  return blanks[randomMove(blanks.length)];
 }

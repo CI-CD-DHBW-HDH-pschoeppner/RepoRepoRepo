@@ -34,7 +34,6 @@ export class Theme {
   }
 }
 
-// You can change these themes or add your own
 export const themes: Theme[] = [
   new Theme({
     primary: "#1e1f26",
